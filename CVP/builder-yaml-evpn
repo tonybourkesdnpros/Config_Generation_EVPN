@@ -1,0 +1,75 @@
+from cvplibrary import Form
+from cvplibrary import CVPGlobalVariables, GlobalVariableNames
+import yaml
+from re import search
+
+def get_hostname():
+  stuff = CVPGlobalVariables.getValue(GlobalVariableNames.CVP_SYSTEM_LABELS)
+  for item in stuff:
+    key, value = item.split(':')
+    if key == 'hostname':
+      hostname = value
+  return(hostname)
+
+hostname = get_hostname()
+
+
+
+
+dict = yaml.load(DC1)
+
+# Create the interface
+def gen_interfaces(interface, ipmask):
+    nonloopback = "thernet"
+    print("interface %s") % (interface)
+    if nonloopback in interface:
+      print("  no switchport")
+    print("  ip address %s") % (ipmask)
+
+
+# Pull off the CIDR notation (needed for router-id)
+def unmask(IP):
+    maskless = IP.split("/", 1)
+    return maskless[0]
+
+def neighbors():
+    print("  neighbor 192.168.101.101 peer group eBGP-EVPN-Spines")
+    print("  neighbor 192.168.101.102 peer group eBGP-EVPN-Spines")
+    print("  neighbor 192.168.101.103 peer group eBGP-EVPN-Spines")
+# Create the 
+def gen_BGP_leaf(ASN,ip):
+    router_id = unmask(ip)
+    print("router bgp %s") % (ASN)
+    print("  router-id %s") % (router_id)
+    print("  neighbor eBGP-EVPN-Spines peer group")
+    print("  neighbor eBGP-EVPN-Spines remote-as 65100")
+    print("  neighbor eBGP-EVPN-Spines bfd")
+    print("  neighbor eBGP-EVPN-Spines ebgp-multihop 5")
+    print("  neighbor eBGP-EVPN-Spines send-community")
+    print("  neighbor eBGP-EVPN-Spines maximum-routes 0")
+    neighbors()
+    print("")
+    print("  address-family evpn")
+    print("     neighbor eBGP-EVPN-Spines activate")
+    print("")
+    print("")
+
+def config_leaf(leaf):
+    for interfaces in dict[leaf]['interfaces']:
+        for interface,ip in interfaces.items():
+            gen_interfaces(interface,ip)
+    for BGP in dict[switch]['BGP']:
+        for key, ASN in BGP.items():
+            ifaces = (dict[switch]['interfaces'])
+            ip = ifaces[0]
+            ifaces2 = ip['loopback0']
+            gen_BGP_leaf(ASN, ifaces2)
+
+
+
+for switch in dict:
+  if switch == hostname:
+        config_leaf(switch)
+
+
+

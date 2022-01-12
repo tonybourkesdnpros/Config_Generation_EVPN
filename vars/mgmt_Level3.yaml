@@ -1,0 +1,27 @@
+spine1:
+  interfaces:
+    management1: 192.168.0.11/24
+spine2:
+  interfaces:
+    management1: 192.168.0.12/24
+spine3:
+  interfaces:
+    management1: 192.168.0.13/24
+leaf1:
+  interfaces:
+    management1: 192.168.0.21/24
+leaf2:
+  interfaces:
+    management1: 192.168.0.22/24
+leaf3:
+  interfaces:
+    management1: 192.168.0.23/24
+leaf4:
+  interfaces:
+    management1: 192.168.0.24/24
+border-leaf1:
+  interfaces:
+    management1: 192.168.0.25/24
+border-leaf2:
+  interfaces:
+    management1: 192.168.0.26/24
